@@ -68,19 +68,17 @@
     [(empty? in_string) (cond
                           [(member current_state final_states) 'string-ACCEPTED]
                           [else 'string-REJECTED])] 
-    [else
-     (let ([input (car in_string)])
-       (set! filtered_delta_fn (filter (lambda (v)
-                                     (match v
-                                       [(list (== current_state) (== input) _) #t]
-                                       [_ #f]))
-                                   delta_fn)))
-     (set! next_state (car (cdr (cdr (car filtered_delta_fn)))))
-     (fsm next_state (cdr in_string) delta_fn)]
+    [else (let ([input (car in_string)])
+            (let ([filtered_delta_fn (filter (lambda (element) (match element
+                                                                 [(list (== current_state) (== input) _) #t]
+                                                                 [_ #f]))
+                                             delta_fn)])
+              (let ([next_state (car (cdr (cdr (car filtered_delta_fn))))])
+                (fsm next_state (cdr in_string) delta_fn))))]
   )
 )
 
-; Launch fsm
+; Apply fsm
 (fsm current_state in_string delta_fn)
 
 
